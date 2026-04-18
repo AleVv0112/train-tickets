@@ -1,0 +1,137 @@
+.ticket-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background: #ffffff;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  padding: 16px;
+}
+
+.ticket-main {
+  min-width: 0;
+}
+
+.ticket-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.ticket-heading h4 {
+  margin: 0;
+  color: var(--brand-900);
+}
+
+.ticket-pill {
+  border-radius: 999px;
+  border: 1px solid rgba(31, 191, 117, 0.4);
+  color: #0f7e4c;
+  background: rgba(31, 191, 117, 0.13);
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  font-weight: 600;
+}
+
+.ticket-route {
+  margin: 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.02rem;
+}
+
+.ticket-route span {
+  color: var(--brand-500);
+  font-weight: 700;
+}
+
+.ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ticket-grid p {
+  margin: 0;
+  background: var(--surface-soft);
+  border-radius: 12px;
+  padding: 10px;
+  color: var(--text-900);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.ticket-grid p span {
+  display: block;
+  color: var(--text-600);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.ticket-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ticket-actions button {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--brand-900);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ticket-actions button:hover {
+  border-color: var(--brand-500);
+}
+
+.ticket-extra {
+  margin: 12px 0 0;
+  color: var(--text-600);
+  font-size: 0.9rem;
+}
+
+.ticket-qr-pane {
+  width: 170px;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  background: linear-gradient(180deg, #fafdff 0%, #ecf4ff 100%);
+  text-align: center;
+}
+
+.ticket-qr-pane p {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  color: var(--brand-700);
+  font-weight: 600;
+}
+
+.ticket-qr-pane img {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 840px) {
+  .ticket-card {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-qr-pane {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 620px) {
+  .ticket-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
