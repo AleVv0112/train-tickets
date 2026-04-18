@@ -1,0 +1,121 @@
+.scanner-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.scanner-box {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  min-height: 260px;
+  background: linear-gradient(180deg, #fbfdff 0%, #ecf4ff 100%);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.scanner-frame {
+  width: 170px;
+  height: 170px;
+  border-radius: 16px;
+  border: 2px dashed rgba(31, 74, 138, 0.5);
+  position: relative;
+}
+
+.scanner-line {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #1fbf75, transparent);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.scanner-box.is-scanning .scanner-line {
+  animation: scan 1.5s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    top: 14px;
+  }
+
+  100% {
+    top: 152px;
+  }
+}
+
+.scanner-box p {
+  margin-top: 10px;
+  color: var(--brand-900);
+  font-weight: 600;
+}
+
+.scanner-controls {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.scanner-controls label {
+  display: grid;
+  gap: 6px;
+  color: var(--text-600);
+  font-weight: 500;
+}
+
+.scanner-controls select {
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0 10px;
+}
+
+.scanner-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.scanner-actions button {
+  border: 0;
+  border-radius: 12px;
+  height: 42px;
+  padding: 0 16px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(120deg, var(--brand-700) 0%, var(--brand-500) 100%);
+  cursor: pointer;
+}
+
+.scanner-validate-btn {
+  background: linear-gradient(120deg, #15945c 0%, #1fbf75 100%) !important;
+}
+
+.scanner-empty {
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+}
+
+.scanner-empty h3 {
+  margin: 0;
+}
+
+.scanner-empty p {
+  margin: 8px 0 0;
+  color: var(--text-600);
+}
+
+@media (max-width: 840px) {
+  .scanner-grid {
+    grid-template-columns: 1fr;
+  }
+}
