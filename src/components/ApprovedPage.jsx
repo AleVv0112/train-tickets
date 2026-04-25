@@ -1,18 +1,26 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import './ApprovedPage.css'
 
-export default function ApprovedPage({ ticket }) {
+export default function ApprovedPage({ ticket, onRemoveTicket }) {
+  const navigate = useNavigate()
+
   if (!ticket) {
     return (
       <section className="approved-shell section-shell section-spacing">
         <h2>Ticket no encontrado</h2>
         <p>El ticket solicitado no existe o aun no fue generado.</p>
-        <Link to="/mis-tickets" className="approved-link-btn">
+        <button className="approved-link-btn" onClick={() => navigate('/mis-tickets')}>
           Ir a Mis Tickets
-        </Link>
+        </button>
       </section>
     )
+  }
+
+  // Handlers para borrar ticket y navegar
+  async function handleAndNavigate(to) {
+    if (onRemoveTicket) await onRemoveTicket()
+    navigate(to)
   }
 
   return (
@@ -40,19 +48,19 @@ export default function ApprovedPage({ ticket }) {
           <span>Fecha y hora</span>
           {ticket.date} | {ticket.time}
         </p>
-        <p>
+        {/* <p>
           <span>Asiento</span>
           {ticket.seat}
-        </p>
+        </p> */}
       </div>
 
       <div className="approved-actions">
-        <Link to="/mis-tickets" className="approved-link-btn">
+        <button className="approved-link-btn" onClick={() => handleAndNavigate('/mis-tickets')}>
           Ver Mis Tickets
-        </Link>
-        <Link to="/comprar" className="approved-link-btn secondary">
+        </button>
+        <button className="approved-link-btn secondary" onClick={() => handleAndNavigate('/comprar')}>
           Comprar Otro Ticket
-        </Link>
+        </button>
       </div>
     </section>
   )

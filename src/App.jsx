@@ -103,11 +103,23 @@ function BuyTicketPage({ onGenerate, latestTicket }) {
   )
 }
 
-function ApprovedRoute({ tickets }) {
-  const { ticketId } = useParams()
-  const ticket = tickets.find(item => item.id === ticketId)
 
-  return <ApprovedPage ticket={ticket} />
+
+
+function ApprovedRoute({ tickets, onTicketValidated }) {
+  const { ticketId } = useParams()
+  const ticketRaw = tickets.find(item => item.id === ticketId)
+  const ticket = mapTicketDBToCard(ticketRaw)
+
+  // Función para borrar el ticket solo cuando el usuario lo decida
+  async function handleRemoveTicket() {
+    if (ticketRaw) {
+      await supabase.from('tickets').delete().eq('id', ticketRaw.id)
+      if (onTicketValidated) onTicketValidated(ticketRaw.id)
+    }
+  }
+
+  return <ApprovedPage ticket={ticket} onRemoveTicket={handleRemoveTicket} />
 }
 
 
@@ -171,9 +183,21 @@ function App() {
     navigate('/')
   }
 
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    setUser(null)
+    setTickets([])
+    navigate('/')
+  }
+
+  // Eliminar ticket del estado local tras validación
+  function handleTicketValidated(ticketId) {
+    setTickets(prev => prev.filter(t => t.id !== ticketId))
+  }
+
   return (
     <div className="app-root">
-      <Navbar user={user} />
+      <Navbar user={user} onLogout={handleLogout} />
 
       <main className="app-main">
         <Routes>
@@ -187,7 +211,7 @@ function App() {
             path="/escanear-qr"
             element={<QRScanner tickets={tickets} onValidate={handleGoToTicket} />}
           />
-          <Route path="/ticket-aprobado/:ticketId" element={<ApprovedRoute tickets={tickets} />} />
+          <Route path="/ticket-aprobado/:ticketId" element={<ApprovedRoute tickets={tickets} onTicketValidated={handleTicketValidated} />} />
           <Route path="/login" element={<Login onAuth={handleAuth} />} />
         </Routes>
       </main>
