@@ -13,18 +13,11 @@ export default function TicketCard({ ticket, showActions = false }) {
   const [expanded, setExpanded] = useState(false)
   const [showQr, setShowQr] = useState(true)
 
-  const qrPayload = useMemo(
-    () =>
-      JSON.stringify({
-        ticketNumber: ticket.ticketNumber,
-        passenger: ticket.passengerName,
-        route: `${ticket.origin}-${ticket.destination}`,
-        date: ticket.date,
-        time: ticket.time,
-        seat: ticket.seat
-      }),
-    [ticket]
-  )
+  // QR apunta a la URL absoluta del ticket aprobado
+  const qrPayload = useMemo(() => {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    return baseUrl + '/ticket-aprobado/' + ticket.ticketNumber;
+  }, [ticket])
 
   useEffect(() => {
     let active = true
@@ -95,10 +88,10 @@ export default function TicketCard({ ticket, showActions = false }) {
             <span>Hora</span>
             {ticket.time}
           </p>
-          <p>
+          {/* <p>
             <span>Asiento</span>
             {ticket.seat}
-          </p>
+          </p> */}
           <p>
             <span>Pasajeros</span>
             {ticket.passengers}

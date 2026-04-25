@@ -2,21 +2,21 @@ import React, { useMemo, useState } from 'react'
 import './TicketForm.css'
 
 const stations = [
-  'Buenos Aires',
-  'Cordoba',
-  'Rosario',
-  'Mendoza',
-  'Mar del Plata',
-  'La Plata',
-  'Tucuman'
+  'San José',
+  'Alajuela',
+  'Cartago',
+  'Heredia',
+  'Guanacaste',
+  'Puntarenas',
+  'Limón'
 ]
 
 const times = ['06:00', '08:30', '11:10', '13:45', '16:20', '19:00', '21:40']
 
 const initialForm = {
   passengerName: '',
-  origin: 'Buenos Aires',
-  destination: 'Cordoba',
+  origin: 'San José',
+  destination: 'Alajuela',
   date: new Date().toISOString().slice(0, 10),
   time: '08:30',
   passengers: '1',

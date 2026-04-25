@@ -6,11 +6,10 @@ const links = [
   { to: '/', label: 'Inicio' },
   { to: '/comprar', label: 'Comprar Ticket' },
   { to: '/mis-tickets', label: 'Mis Tickets' },
-  { to: '/escanear-qr', label: 'Escanear QR' },
-  { to: '/soporte', label: 'Soporte', fallback: true }
+  { to: '/escanear-qr', label: 'Escanear QR' }
 ]
 
-export default function Navbar() {
+export default function Navbar({ user }) {
   return (
     <header className="navbar-shell">
       <div className="navbar-inner">
@@ -22,26 +21,26 @@ export default function Navbar() {
         </Link>
 
         <nav className="nav-links" aria-label="Navegacion principal">
-          {links.map(link =>
-            link.fallback ? (
-              <a key={link.label} href="#footer" className="nav-item">
-                {link.label}
-              </a>
-            ) : (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-              >
-                {link.label}
-              </NavLink>
-            )
-          )}
+          {links.map(link => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            >
+              {link.label}
+            </NavLink>
+          ))}
         </nav>
 
-        <button className="login-btn" type="button">
-          Iniciar Sesion
-        </button>
+        {user && user.profile ? (
+          <span className="login-btn" style={{pointerEvents: 'none', userSelect: 'none'}}>
+            {user.profile.nickname}
+          </span>
+        ) : (
+          <NavLink to="/login" className="login-btn">
+            Iniciar Sesion
+          </NavLink>
+        )}
       </div>
     </header>
   )

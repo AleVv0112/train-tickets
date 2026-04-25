@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Route, Routes, useNavigate, useParams } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
@@ -8,15 +8,17 @@ import TicketList from './components/TicketList'
 import QRScanner from './components/QRScanner'
 import ApprovedPage from './components/ApprovedPage'
 import Footer from './components/Footer'
+import Login from './components/Login'
+import { supabase } from './supabaseClient'
 import './App.css'
 
-const STORAGE_KEY = 'railticketpro_tickets'
+// Eliminado uso de localStorage para tickets
 
 function randomFrom(list) {
   return list[Math.floor(Math.random() * list.length)]
 }
 
-function generateTicket(formData) {
+function generateTicket(formData, userId) {
   const classPrice = {
     economica: 35,
     ejecutiva: 60,
@@ -32,18 +34,14 @@ function generateTicket(formData) {
   const passengers = Number(formData.passengers)
 
   return {
-    id: crypto.randomUUID(),
-    ticketNumber,
-    passengerName: formData.passengerName,
-    origin: formData.origin,
-    destination: formData.destination,
-    date: formData.date,
-    time: formData.time,
-    passengers,
-    travelClass: formData.travelClass,
-    seat,
-    price: unitPrice * passengers,
-    createdAt: new Date().toISOString()
+    user_id: userId,
+    nombre_completo: formData.passengerName,
+    horario_tren: formData.time,
+    destino_ruta: formData.destination,
+    estacion_salida: formData.origin,
+    monto_pagado: unitPrice * passengers,
+    created_at: new Date().toISOString(),
+    used: false
   }
 }
 
@@ -69,6 +67,22 @@ function HomePage() {
   )
 }
 
+function mapTicketDBToCard(ticket) {
+  if (!ticket) return null;
+  return {
+    id: ticket.id,
+    ticketNumber: ticket.id || '',
+    passengerName: ticket.nombre_completo || '',
+    date: ticket.created_at ? ticket.created_at.slice(0, 10) : '',
+    time: ticket.horario_tren || '',
+    origin: ticket.estacion_salida || '',
+    destination: ticket.destino_ruta || '',
+    travelClass: ticket.travelClass || 'economica',
+    passengers: ticket.passengers || 1,
+    price: ticket.monto_pagado || '',
+  }
+}
+
 function BuyTicketPage({ onGenerate, latestTicket }) {
   return (
     <section className="section-shell section-spacing">
@@ -82,7 +96,7 @@ function BuyTicketPage({ onGenerate, latestTicket }) {
       {latestTicket ? (
         <div className="latest-ticket-wrapper">
           <h3>Ticket generado</h3>
-          <TicketCard ticket={latestTicket} showActions />
+          <TicketCard ticket={mapTicketDBToCard(latestTicket)} showActions />
         </div>
       ) : null}
     </section>
@@ -96,52 +110,77 @@ function ApprovedRoute({ tickets }) {
   return <ApprovedPage ticket={ticket} />
 }
 
-export default function App() {
+
+function App() {
   const [tickets, setTickets] = useState([])
-  const [latestTicketId, setLatestTicketId] = useState('')
+  const [user, setUser] = useState(null)
   const navigate = useNavigate()
 
+  // Detectar usuario autenticado al cargar la app
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        if (Array.isArray(parsed)) setTickets(parsed)
-      } catch {
-        localStorage.removeItem(STORAGE_KEY)
+    async function getCurrentUser() {
+      const { data } = await supabase.auth.getUser()
+      if (data && data.user) {
+        // Buscar perfil
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single()
+        setUser({ ...data.user, profile })
       }
     }
+    getCurrentUser()
   }, [])
 
+  // Cargar tickets del usuario autenticado
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets))
-  }, [tickets])
+    async function fetchTickets() {
+      if (user && user.id) {
+        const { data, error } = await supabase
+          .from('tickets')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+        if (!error) setTickets(data)
+      } else {
+        setTickets([])
+      }
+    }
+    fetchTickets()
+  }, [user])
 
-  const latestTicket = useMemo(
-    () => tickets.find(item => item.id === latestTicketId) ?? null,
-    [tickets, latestTicketId]
-  )
-
-  function handleGenerateTicket(formData) {
-    const newTicket = generateTicket(formData)
-    setTickets(prev => [newTicket, ...prev])
-    setLatestTicketId(newTicket.id)
+  async function handleGenerateTicket(formData) {
+    if (!user || !user.id) return
+    const newTicket = generateTicket(formData, user.id)
+    const { data, error } = await supabase
+      .from('tickets')
+      .insert([newTicket])
+      .select('*')
+    if (!error && data && data.length > 0) {
+      setTickets(prev => [data[0], ...prev])
+    }
   }
 
   function handleGoToTicket(ticketId) {
     navigate(`/ticket-aprobado/${ticketId}`)
   }
 
+  function handleAuth(user) {
+    setUser(user)
+    navigate('/')
+  }
+
   return (
     <div className="app-root">
-      <Navbar />
+      <Navbar user={user} />
 
       <main className="app-main">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route
             path="/comprar"
-            element={<BuyTicketPage onGenerate={handleGenerateTicket} latestTicket={latestTicket} />}
+            element={<BuyTicketPage onGenerate={handleGenerateTicket} latestTicket={tickets[0] || null} />}
           />
           <Route path="/mis-tickets" element={<TicketList tickets={tickets} />} />
           <Route
@@ -149,6 +188,7 @@ export default function App() {
             element={<QRScanner tickets={tickets} onValidate={handleGoToTicket} />}
           />
           <Route path="/ticket-aprobado/:ticketId" element={<ApprovedRoute tickets={tickets} />} />
+          <Route path="/login" element={<Login onAuth={handleAuth} />} />
         </Routes>
       </main>
 
@@ -156,3 +196,5 @@ export default function App() {
     </div>
   )
 }
+
+export default App
