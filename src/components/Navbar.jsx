@@ -9,7 +9,7 @@ const links = [
   { to: '/escanear-qr', label: 'Escanear QR' }
 ]
 
-export default function Navbar({ user }) {
+export default function Navbar({ user, onLogout }) {
   return (
     <header className="navbar-shell">
       <div className="navbar-inner">
@@ -33,9 +33,14 @@ export default function Navbar({ user }) {
         </nav>
 
         {user && user.profile ? (
-          <span className="login-btn" style={{pointerEvents: 'none', userSelect: 'none'}}>
-            {user.profile.nickname}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span className="login-btn" style={{pointerEvents: 'none', userSelect: 'none'}}>
+              {user.profile.nickname}
+            </span>
+            <button type="button" className="login-btn" onClick={onLogout} style={{marginLeft: 0}}>
+              Cerrar sesión
+            </button>
+          </div>
         ) : (
           <NavLink to="/login" className="login-btn">
             Iniciar Sesion

@@ -33,7 +33,7 @@ export default function Footer() {
           <h4>Contacto</h4>
           <ul>
             <li>soporte@railticketpro.com</li>
-            <li>+54 11 4321 2300</li>
+            <li>+506 9055 0349</li>
             <li>Centro de Atencion 24/7</li>
           </ul>
         </article>

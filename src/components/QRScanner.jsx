@@ -33,6 +33,16 @@ export default function QRScanner({ tickets, onValidate }) {
     }, 1600)
   }
 
+  // Mapea los campos igual que en TicketList
+  const mapTicket = (ticket) => ({
+    id: ticket.id,
+    ticketNumber: ticket.id || '',
+    origin: ticket.estacion_salida || '',
+    destination: ticket.destino_ruta || '',
+  })
+
+  const mappedTickets = tickets.map(mapTicket)
+
   return (
     <section className="section-shell section-spacing">
       <header className="section-header">
@@ -61,7 +71,7 @@ export default function QRScanner({ tickets, onValidate }) {
             <label>
               Ticket a validar
               <select value={selectedId} onChange={event => setSelectedId(event.target.value)}>
-                {tickets.map(ticket => (
+                {mappedTickets.map(ticket => (
                   <option key={ticket.id} value={ticket.id}>
                     {`${ticket.ticketNumber} | ${ticket.origin} - ${ticket.destination}`}
                   </option>
